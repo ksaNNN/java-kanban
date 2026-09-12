@@ -12,6 +12,14 @@ public class Task {
         this.status = TaskStatus.NEW;
     }
 
+    // Конструктор копирования — создаёт независимую копию другой задачи
+    public Task(Task other) {
+        this.id = other.id;
+        this.name = other.name;
+        this.description = other.description;
+        this.status = other.status;
+    }
+
     public int getId() {
         return id;
     }
