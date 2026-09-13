@@ -8,8 +8,19 @@ public class Epic extends Task {
         this.subtaskIds = new ArrayList<>();
     }
 
+    // Конструктор копирования
+    public Epic(Epic other) {
+        super(other);
+        this.subtaskIds = new ArrayList<>(other.subtaskIds); // копируем сПиСоК, а не ссылку на него
+    }
+
     public ArrayList<Integer> getSubtaskIds() {
-        return subtaskIds;
+        return new ArrayList<>(subtaskIds); // отдаём копию вместо оригинала
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
     }
 
     public void addSubtaskId(int subtaskId) {

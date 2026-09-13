@@ -6,12 +6,23 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
+    // Конструктор копирования
+    public Subtask(Subtask other) {
+        super(other);
+        this.epicId = other.epicId;
+    }
+
     public int getEpicId() {
         return epicId;
     }
 
     public void setEpicId(int epicId) {
         this.epicId = epicId;
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
     }
 
     @Override

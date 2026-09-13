@@ -66,6 +66,17 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    void deleteTaskAlsoRemovesItFromHistory() {
+        Task task = taskManager.createTask(new Task("Задача", "Описание"));
+        taskManager.getTaskById(task.getId());
+
+        taskManager.deleteTask(task.getId());
+
+        assertFalse(taskManager.getHistory().contains(task),
+                "Удалённая задача не должна оставаться в истории просмотров");
+    }
+
+    @Test
     void createEpic() {
         Epic epic = new Epic("Эпик", "Описание эпика");
         Epic createdEpic = taskManager.createEpic(epic);
@@ -83,7 +94,9 @@ class InMemoryTaskManagerTest {
 
         assertNotNull(createdSubtask, "Подзадача не создана");
         assertEquals(epic.getId(), createdSubtask.getEpicId(), "ID эпика не совпадает");
-        assertTrue(epic.getSubtaskIds().contains(createdSubtask.getId()), "Подзадача не добавлена в эпик");
+
+        Epic updatedEpic = taskManager.getEpicById(epic.getId());
+        assertTrue(updatedEpic.getSubtaskIds().contains(createdSubtask.getId()), "Подзадача не добавлена в эпик");
     }
 
     @Test
@@ -136,6 +149,44 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    void deleteEpicAlsoRemovesItsSubtasksFromHistory() {
+        Epic epic = taskManager.createEpic(new Epic("Эпик", "Описание"));
+        Subtask subtask = taskManager.createSubtask(new Subtask("Подзадача", "Описание", epic.getId()));
+
+        taskManager.getEpicById(epic.getId());
+        taskManager.getSubtaskById(subtask.getId());
+
+        taskManager.deleteEpic(epic.getId());
+
+        List<Task> history = taskManager.getHistory();
+        assertFalse(history.contains(epic), "Эпик не должен остаться в истории после удаления");
+        assertFalse(history.contains(subtask), "Подзадача эпика не должна остаться в истории после удаления");
+    }
+
+    @Test
+    void deletedSubtaskIdIsRemovedFromEpicSubtaskIds() {
+        Epic epic = taskManager.createEpic(new Epic("Эпик", "Описание"));
+        Subtask subtask = taskManager.createSubtask(new Subtask("Подзадача", "Описание", epic.getId()));
+
+        taskManager.deleteSubtask(subtask.getId());
+
+        Epic updatedEpic = taskManager.getEpicById(epic.getId());
+        assertFalse(updatedEpic.getSubtaskIds().contains(subtask.getId()),
+                "Внутри эпика не должно оставаться id удалённой подзадачи");
+    }
+
+    @Test
+    void subtaskIsNotAccessibleAfterEpicDeletion() {
+        Epic epic = taskManager.createEpic(new Epic("Эпик", "Описание"));
+        Subtask subtask = taskManager.createSubtask(new Subtask("Подзадача", "Описание", epic.getId()));
+
+        taskManager.deleteEpic(epic.getId());
+
+        assertTrue(taskManager.getAllSubtasks().isEmpty(),
+                "После удаления эпика её подзадачи не должны храниться в общем списке подзадач");
+    }
+
+    @Test
     void historyContainsViewedTasks() {
         Task task = taskManager.createTask(new Task("Задача", "Описание"));
         Epic epic = taskManager.createEpic(new Epic("Эпик", "Описание"));
@@ -151,13 +202,49 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void historyLimitedTo10Tasks() {
+    void historyHasNoLimitViaManager() {
         for (int i = 0; i < 15; i++) {
             Task task = taskManager.createTask(new Task("Задача " + i, "Описание"));
             taskManager.getTaskById(task.getId());
         }
 
         List<Task> history = taskManager.getHistory();
-        assertEquals(10, history.size(), "История должна содержать максимум 10 задач");
+        assertEquals(15, history.size(), "История через менеджер не должна ограничиваться 10 элементами");
+    }
+
+    @Test
+    void repeatedViewViaManagerDoesNotCreateDuplicate() {
+        Task task = taskManager.createTask(new Task("Задача", "Описание"));
+
+        taskManager.getTaskById(task.getId());
+        taskManager.getTaskById(task.getId());
+        taskManager.getTaskById(task.getId());
+
+        assertEquals(1, taskManager.getHistory().size(),
+                "Повторный просмотр через менеджер не должен создавать дубли в истории");
+    }
+
+    @Test
+    void changingTaskViaSetterAfterGettingItDoesNotAffectStoredTask() {
+        Task task = taskManager.createTask(new Task("Задача", "Описание"));
+
+        Task retrievedTask = taskManager.getTaskById(task.getId());
+        retrievedTask.setStatus(TaskStatus.DONE);
+
+        Task storedTaskAgain = taskManager.getTaskById(task.getId());
+        assertEquals(TaskStatus.NEW, storedTaskAgain.getStatus(),
+                "Изменение копии не должно влиять на задачу, хранимую внутри менеджера");
+    }
+
+    @Test
+    void modifyingEpicSubtaskIdsListDirectlyDoesNotAffectManager() {
+        Epic epic = taskManager.createEpic(new Epic("Эпик", "Описание"));
+        Subtask subtask = taskManager.createSubtask(new Subtask("Подзадача", "Описание", epic.getId()));
+
+        epic.getSubtaskIds().clear();
+
+        Epic storedEpic = taskManager.getEpicById(epic.getId());
+        assertTrue(storedEpic.getSubtaskIds().contains(subtask.getId()),
+                "getSubtaskIds() должен возвращать копию — очистка снаружи не должна ломать эпик внутри менеджера");
     }
 }
