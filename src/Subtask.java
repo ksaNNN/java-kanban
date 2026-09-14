@@ -1,3 +1,6 @@
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
     private int epicId;
 
@@ -6,7 +9,11 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
-    // Конструктор копирования
+    public Subtask(String name, String description, int epicId, Duration duration, LocalDateTime startTime) {
+        super(name, description, duration, startTime);
+        this.epicId = epicId;
+    }
+
     public Subtask(Subtask other) {
         super(other);
         this.epicId = other.epicId;
@@ -32,6 +39,8 @@ public class Subtask extends Task {
                 ", name='" + getName() + '\'' +
                 ", status=" + getStatus() +
                 ", epicId=" + epicId +
+                ", duration=" + getDuration() +
+                ", startTime=" + getStartTime() +
                 '}';
     }
 }
