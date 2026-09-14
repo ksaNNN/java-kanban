@@ -52,12 +52,11 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         if (tail == null) {
             head = newNode;
-            tail = newNode;
         } else {
             tail.next = newNode;
             newNode.prev = tail;
-            tail = newNode;
         }
+        tail = newNode;
 
         nodeMap.put(task.getId(), newNode);
     }
@@ -77,8 +76,5 @@ public class InMemoryHistoryManager implements HistoryManager {
         } else {
             tail = prev;
         }
-
-        node.prev = null;
-        node.next = null;
     }
 }
