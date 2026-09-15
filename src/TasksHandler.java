@@ -43,13 +43,13 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
     private void handleGet(HttpExchange exchange, String[] parts) throws IOException {
         if (parts.length == 2) {
-            sendText(exchange, gson.toJson(manager.getAllTasks()), 200);
+            sendText(exchange, gson.toJson(manager.getAllTasks()), STATUS_OK);
             return;
         }
         if (parts.length == 3) {
             int id = Integer.parseInt(parts[2]);
             Task task = manager.getTaskById(id);
-            sendText(exchange, gson.toJson(task), 200);
+            sendText(exchange, gson.toJson(task), STATUS_OK);
             return;
         }
         sendNotFound(exchange, "Некорректный путь запроса");
@@ -74,6 +74,6 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         } else {
             manager.deleteAllTasks();
         }
-        sendText(exchange, "", 200);
+        sendText(exchange, "", STATUS_OK);
     }
 }

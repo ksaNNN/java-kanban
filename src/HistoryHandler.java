@@ -17,7 +17,7 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
                 sendNotFound(exchange, "Некорректный метод запроса");
                 return;
             }
-            sendText(exchange, gson.toJson(manager.getHistory()), 200);
+            sendText(exchange, gson.toJson(manager.getHistory()), STATUS_OK);
         } catch (Exception e) {
             sendServerError(exchange, "Произошла ошибка при обработке запроса: " + e.getMessage());
         }

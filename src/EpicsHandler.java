@@ -41,19 +41,19 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
 
     private void handleGet(HttpExchange exchange, String[] parts) throws IOException {
         if (parts.length == 2) {
-            sendText(exchange, gson.toJson(manager.getAllEpics()), 200);
+            sendText(exchange, gson.toJson(manager.getAllEpics()), STATUS_OK);
             return;
         }
         if (parts.length == 3) {
             int id = Integer.parseInt(parts[2]);
             Epic epic = manager.getEpicById(id);
-            sendText(exchange, gson.toJson(epic), 200);
+            sendText(exchange, gson.toJson(epic), STATUS_OK);
             return;
         }
         if (parts.length == 4 && parts[3].equals("subtasks")) {
             int id = Integer.parseInt(parts[2]);
-            manager.getEpicById(id); // бросит NotFoundException, если эпика нет
-            sendText(exchange, gson.toJson(manager.getSubtasksByEpic(id)), 200);
+            manager.getEpicById(id);
+            sendText(exchange, gson.toJson(manager.getSubtasksByEpic(id)), STATUS_OK);
             return;
         }
         sendNotFound(exchange, "Некорректный путь запроса");
@@ -79,6 +79,6 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         } else {
             manager.deleteAllEpics();
         }
-        sendText(exchange, "", 200);
+        sendText(exchange, "", STATUS_OK);
     }
 }

@@ -17,7 +17,7 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
                 sendNotFound(exchange, "Некорректный метод запроса");
                 return;
             }
-            sendText(exchange, gson.toJson(manager.getPrioritizedTasks()), 200);
+            sendText(exchange, gson.toJson(manager.getPrioritizedTasks()), STATUS_OK);
         } catch (Exception e) {
             sendServerError(exchange, "Произошла ошибка при обработке запроса: " + e.getMessage());
         }

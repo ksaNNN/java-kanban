@@ -43,13 +43,13 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
 
     private void handleGet(HttpExchange exchange, String[] parts) throws IOException {
         if (parts.length == 2) {
-            sendText(exchange, gson.toJson(manager.getAllSubtasks()), 200);
+            sendText(exchange, gson.toJson(manager.getAllSubtasks()), STATUS_OK);
             return;
         }
         if (parts.length == 3) {
             int id = Integer.parseInt(parts[2]);
             Subtask subtask = manager.getSubtaskById(id);
-            sendText(exchange, gson.toJson(subtask), 200);
+            sendText(exchange, gson.toJson(subtask), STATUS_OK);
             return;
         }
         sendNotFound(exchange, "Некорректный путь запроса");
@@ -74,6 +74,6 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
         } else {
             manager.deleteAllSubtasks();
         }
-        sendText(exchange, "", 200);
+        sendText(exchange, "", STATUS_OK);
     }
 }
