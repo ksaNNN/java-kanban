@@ -78,7 +78,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
         if (task == null) {
-            return null;
+            throw new NotFoundException("Задача с id=" + id + " не найдена");
         }
         Task copy = new Task(task);
         historyManager.add(copy);
@@ -104,6 +104,8 @@ public class InMemoryTaskManager implements TaskManager {
             Task copy = new Task(task);
             tasks.put(task.getId(), copy);
             addToPrioritized(copy);
+        } else {
+            throw new NotFoundException("Задача с id=" + task.getId() + " не найдена");
         }
     }
 
@@ -138,7 +140,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
         if (epic == null) {
-            return null;
+            throw new NotFoundException("Эпик с id=" + id + " не найден");
         }
         Epic copy = new Epic(epic);
         historyManager.add(copy);
@@ -158,6 +160,8 @@ public class InMemoryTaskManager implements TaskManager {
             existingEpic.setDescription(epic.getDescription());
             updateEpicStatus(existingEpic);
             updateEpicFields(existingEpic);
+        } else {
+            throw new NotFoundException("Эпик с id=" + epic.getId() + " не найден");
         }
     }
 
@@ -210,7 +214,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask getSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
         if (subtask == null) {
-            return null;
+            throw new NotFoundException("Подзадача с id=" + id + " не найдена");
         }
         Subtask copy = new Subtask(subtask);
         historyManager.add(copy);
@@ -242,6 +246,8 @@ public class InMemoryTaskManager implements TaskManager {
                 updateEpicStatus(epic);
                 updateEpicFields(epic);
             }
+        } else {
+            throw new NotFoundException("Подзадача с id=" + subtask.getId() + " не найдена");
         }
     }
 
